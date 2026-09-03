@@ -54,7 +54,7 @@ const projects: Project[] = [
     accent: '#c9d2c4',
     kind: 'traffic',
     details: 'Built a hybrid machine learning framework to predict urban traffic congestion, ensemble models through data preprocessing and feature engineering, and visualize insights for route optimization.',
-    githubUrl: 'https://github.com/dharshini66',
+    githubUrl: 'https://github.com/dharshini66/XatBoost-Traffic-Optimization',
   },
   {
     number: '03',
@@ -296,7 +296,14 @@ function App() {
             <p className="eyebrow">RESEARCH / PUBLICATIONS</p>
             <h2>Ideas in<br /><em>motion.</em></h2>
           </div>
-          <article className="research-reel">
+          <a
+            href="https://github.com/dharshini66/XatBoost-Traffic-Optimization"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="research-reel"
+            style={{ textDecoration: 'none', color: 'inherit', display: 'grid' }}
+            title="View XatBoost Research Repository"
+          >
             <div className="reel-tag">REEL 01</div>
             <div className="research-visual">
               <div className="chart-line" />
@@ -317,7 +324,7 @@ function App() {
               </div>
             </div>
             <ArrowUpRight className="research-arrow" size={20} />
-          </article>
+          </a>
         </section>
 
         {/* EXPERIENCE SECTION */}
