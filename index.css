@@ -55,6 +55,16 @@ button { border: 0; cursor: pointer; color: inherit; background: transparent; }
 
 .site-header { position: fixed; z-index: 20; top: 0; left: 50%; width: min(100% - 48px, 1240px); transform: translateX(-50%); display: flex; align-items: center; justify-content: space-between; height: 72px; border-bottom: 1px solid var(--line); background: var(--header-bg); backdrop-filter: blur(12px); transition: background-color 0.3s ease, border-color 0.3s ease; }
 
+.scroll-progress-line {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--red);
+  transition: width 0.1s linear;
+  z-index: 25;
+}
+
 .brand-mark, .desktop-nav button, .eyebrow, .film-number, .object-label, .object-stamp, .contact-sheet-label, .tag-row, .frame-index, .visual-top, .entry-date, footer, .card-label, .theme-switch, .resume-btn, .cli-btn { font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
 .brand-mark { background: transparent; padding: 12px 0; font-weight: 500; display: inline-flex; align-items: center; }
 .play-mark, .record-dot { color: var(--red); }
@@ -68,8 +78,19 @@ button { border: 0; cursor: pointer; color: inherit; background: transparent; }
 
 .header-actions { display: flex; align-items: center; gap: 14px; }
 .desktop-nav { display: flex; gap: clamp(14px, 2.5vw, 36px); }
-.desktop-nav button { background: transparent; transition: color .2s; }
+.desktop-nav button { background: transparent; transition: color .2s; position: relative; }
 .desktop-nav button:hover, .text-link:hover, .red-link:hover { color: var(--red); }
+.desktop-nav button.active-nav { color: var(--red); font-weight: 600; }
+.desktop-nav button.active-nav:after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  background: var(--red);
+  border-radius: 1px;
+}
 
 /* Theme Switcher Button */
 .theme-switch {
@@ -506,7 +527,37 @@ footer { border-top: 1px solid rgba(244,239,230,.18); margin-top: 90px; padding:
   .project-modal h2 { font-size: 32px; }
 }
 
+/* Scroll Animations & Reveal System */
+section[id], main#top {
+  scroll-margin-top: 80px;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.12s; }
+.reveal-delay-2 { transition-delay: 0.24s; }
+.reveal-delay-3 { transition-delay: 0.36s; }
+.reveal-delay-4 { transition-delay: 0.48s; }
+
+/* Dynamic Tape Spooling animation on reels */
+.reel-spool {
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *:before, *:after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
 }
+
 

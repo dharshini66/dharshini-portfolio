@@ -87,6 +87,9 @@ function App() {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [cliOpen, setCliOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [scrollRotation, setScrollRotation] = useState(0);
+  const [activeSection, setActiveSection] = useState('top');
   const [theme, setTheme] = useState<'side-a' | 'side-b'>(() => {
     return (localStorage.getItem('portfolio_theme') as 'side-a' | 'side-b') || 'side-a';
   });
@@ -105,6 +108,56 @@ function App() {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen, activeProject, cliOpen]);
 
+  // Scroll listener for progress bar, tape rotation, and scrollspy
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+      const progress = totalHeight > 0 ? (currentScroll / totalHeight) * 100 : 0;
+      setScrollProgress(progress);
+      setScrollRotation(currentScroll * 0.45);
+
+      const sectionIds = ['contact', 'skills', 'experience', 'research', 'projects', 'about'];
+      let found = false;
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 200) {
+            setActiveSection(id);
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found && currentScroll < 300) {
+        setActiveSection('top');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Intersection observer for buttery smooth scroll reveals
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    const revealElements = document.querySelectorAll('.reveal');
+    revealElements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setMenuOpen(false);
@@ -114,13 +167,21 @@ function App() {
     <div className="site-shell">
       <div className="grain" aria-hidden="true" />
       <header className="site-header">
+        <div className="scroll-progress-line" style={{ width: `${scrollProgress}%` }} />
+        
         <button className="brand-mark" onClick={() => scrollTo('top')} aria-label="Back to top">
           <span className="play-mark">▸</span> REC <span className="record-dot" />
         </button>
 
         <nav className="desktop-nav" aria-label="Primary navigation">
           {navItems.map(([id, label]) => (
-            <button key={id} onClick={() => scrollTo(id)}>{label}</button>
+            <button
+              key={id}
+              className={activeSection === id ? 'active-nav' : ''}
+              onClick={() => scrollTo(id)}
+            >
+              {label}
+            </button>
           ))}
         </nav>
 
@@ -221,7 +282,7 @@ function App() {
               D.B.J. / {theme === 'side-a' ? 'SIDE A' : 'SIDE B'}<br />
               <small>FIELD NOTES 2026</small>
             </div>
-            <Cassette isPlaying={isPlaying} theme={theme} />
+            <Cassette isPlaying={isPlaying} theme={theme} scrollRotation={scrollRotation} />
             <div className="object-stamp">
               ARCHIVE<br /><span>25</span><br />08
             </div>
@@ -235,19 +296,19 @@ function App() {
         </section>
 
         {/* ABOUT SECTION */}
-        <section id="about" className="about section-frame section-pad">
+        <section id="about" className="about section-frame section-pad reveal">
           <div className="film-number">02 <span>/ 06</span></div>
           <div className="section-heading">
             <p className="eyebrow">A LITTLE ABOUT ME</p>
             <h2>Curious mind,<br /><em>creative heart.</em></h2>
           </div>
-          <div className="about-card notebook-card">
+          <div className="about-card notebook-card reveal reveal-delay-1">
             <span className="tape" />
             <p className="card-label">NOTE / 001</p>
             <p>I enjoy solving real-world problems with code, data, and creativity.</p>
             <span className="card-mark">— D.B.J.</span>
           </div>
-          <div className="about-copy">
+          <div className="about-copy reveal reveal-delay-2">
             <p>
               I’m a Computer Science and Engineering student specializing in Cloud Computing at SRM Institute of Science and Technology, with a CGPA of 9.58/10.0.
             </p>
@@ -261,7 +322,7 @@ function App() {
         </section>
 
         {/* PROJECTS SECTION */}
-        <section id="projects" className="projects section-frame section-pad">
+        <section id="projects" className="projects section-frame section-pad reveal">
           <div className="film-number">03 <span>/ 06</span></div>
           <div className="section-heading projects-heading">
             <div>
@@ -273,10 +334,11 @@ function App() {
             </p>
           </div>
           <div className="project-grid">
-            {projects.map((project) => (
+            {projects.map((project, idx) => (
               <ProjectCard
                 key={project.number}
                 project={project}
+                delayClass={`reveal reveal-delay-${idx + 1}`}
                 onOpen={() => setActiveProject(project)}
               />
             ))}
@@ -287,7 +349,7 @@ function App() {
         </section>
 
         {/* RESEARCH SECTION */}
-        <section id="research" className="research section-frame section-pad">
+        <section id="research" className="research section-frame section-pad reveal">
           <div className="film-number">04 <span>/ 06</span></div>
           <div className="section-heading">
             <p className="eyebrow">RESEARCH / PUBLICATIONS</p>
@@ -297,7 +359,7 @@ function App() {
             href="https://github.com/dharshini66/XatBoost-Traffic-Optimization"
             target="_blank"
             rel="noopener noreferrer"
-            className="research-reel"
+            className="research-reel reveal reveal-delay-1"
             style={{ textDecoration: 'none', color: 'inherit', display: 'grid' }}
             title="View XatBoost Research Repository"
           >
@@ -325,13 +387,13 @@ function App() {
         </section>
 
         {/* EXPERIENCE SECTION */}
-        <section id="experience" className="experience section-frame section-pad">
+        <section id="experience" className="experience section-frame section-pad reveal">
           <div className="section-heading">
             <p className="eyebrow">THE FIELD NOTES</p>
             <h2>Where I’ve<br /><em>learned.</em></h2>
           </div>
           <div className="timeline">
-            <div className="timeline-entry">
+            <div className="timeline-entry reveal reveal-delay-1">
               <div className="reel-tag">REEL 02</div>
               <div>
                 <p className="entry-date">MAY 2026 — JUL 2026 <span>CHENNAI, INDIA</span></p>
@@ -339,7 +401,7 @@ function App() {
                 <p>Assisted SAP consulting and enterprise workflows by analyzing business requirements, conducting testing, and supporting process documentation.</p>
               </div>
             </div>
-            <div className="timeline-entry">
+            <div className="timeline-entry reveal reveal-delay-2">
               <div className="reel-tag">REEL 03</div>
               <div>
                 <p className="entry-date">JAN 2025 — FEB 2025 <span>REMOTE</span></p>
@@ -348,7 +410,7 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="education-strip">
+          <div className="education-strip reveal reveal-delay-3">
             <div>
               <p className="eyebrow">EDUCATION</p>
               <h3>SRM Institute of Science and Technology</h3>
@@ -359,22 +421,22 @@ function App() {
         </section>
 
         {/* SKILLS SECTION */}
-        <section id="skills" className="skills section-frame section-pad">
+        <section id="skills" className="skills section-frame section-pad reveal">
           <div className="film-number">05 <span>/ 06</span></div>
           <div className="section-heading">
             <p className="eyebrow">TOOLS OF THE TRADE</p>
             <h2>Learning by<br /><em>making.</em></h2>
           </div>
           <div className="skills-grid">
-            {skillGroups.map(({ label, icon: Icon, skills }) => (
-              <div className="skill-group" key={label}>
+            {skillGroups.map(({ label, icon: Icon, skills }, idx) => (
+              <div className={`skill-group reveal reveal-delay-${(idx % 3) + 1}`} key={label}>
                 <div className="skill-icon"><Icon size={22} /></div>
                 <h3>{label}</h3>
                 <ul>{skills.map(skill => <li key={skill}>{skill}</li>)}</ul>
               </div>
             ))}
           </div>
-          <div className="archive-grid">
+          <div className="archive-grid reveal">
             <div>
               <p className="eyebrow">CERTIFICATIONS</p>
               <div className="archive-list">
@@ -393,10 +455,10 @@ function App() {
         </section>
 
         {/* CONTACT SECTION */}
-        <section id="contact" className="contact section-frame section-pad">
+        <section id="contact" className="contact section-frame section-pad reveal">
           <div className="film-number">06 <span>/ 06</span></div>
           <div className="contact-top">
-            <div>
+            <div className="reveal reveal-delay-1">
               <p className="eyebrow">LET’S CONNECT</p>
               <h2>Let’s create<br /><em>something great.</em></h2>
               <div className="contact-links">
@@ -415,7 +477,9 @@ function App() {
               </div>
             </div>
 
-            <ContactMemoForm />
+            <div className="reveal reveal-delay-2">
+              <ContactMemoForm />
+            </div>
           </div>
 
           <footer>
@@ -482,7 +546,7 @@ function App() {
   );
 }
 
-function Cassette({ isPlaying, theme }: { isPlaying: boolean; theme: 'side-a' | 'side-b' }) {
+function Cassette({ isPlaying, theme, scrollRotation = 0 }: { isPlaying: boolean; theme: 'side-a' | 'side-b'; scrollRotation?: number }) {
   return (
     <div className={`cassette ${isPlaying ? 'is-playing' : ''}`}>
       <div className="cassette-top">
@@ -490,11 +554,17 @@ function Cassette({ isPlaying, theme }: { isPlaying: boolean; theme: 'side-a' | 
         <span>60</span>
       </div>
       <div className="cassette-window">
-        <div className="reel reel-left">
+        <div
+          className="reel reel-left reel-spool"
+          style={{ transform: !isPlaying ? `rotate(${scrollRotation}deg)` : undefined }}
+        >
           <span />
         </div>
         <div className="tape-window" />
-        <div className="reel reel-right">
+        <div
+          className="reel reel-right reel-spool"
+          style={{ transform: !isPlaying ? `rotate(${scrollRotation}deg)` : undefined }}
+        >
           <span />
         </div>
       </div>
@@ -510,10 +580,10 @@ function Cassette({ isPlaying, theme }: { isPlaying: boolean; theme: 'side-a' | 
   );
 }
 
-function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
+function ProjectCard({ project, onOpen, delayClass = '' }: { project: Project; onOpen: () => void; delayClass?: string }) {
   return (
     <article
-      className="project-card"
+      className={`project-card ${delayClass}`}
       style={{ '--card-accent': project.accent } as CSSProperties}
       tabIndex={0}
       onKeyDown={(event) => { if (event.key === 'Enter') onOpen(); }}
