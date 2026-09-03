@@ -17,7 +17,6 @@ import {
   Pause,
   Send,
   Sun,
-  Terminal,
   X,
 } from 'lucide-react';
 
@@ -85,7 +84,6 @@ const navItems = [
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [cliOpen, setCliOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [scrollRotation, setScrollRotation] = useState(0);
@@ -104,9 +102,9 @@ function App() {
   };
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen || activeProject || cliOpen ? 'hidden' : '';
+    document.body.style.overflow = menuOpen || activeProject ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [menuOpen, activeProject, cliOpen]);
+  }, [menuOpen, activeProject]);
 
   // Scroll listener for progress bar, tape rotation, and scrollspy
   useEffect(() => {
@@ -198,23 +196,13 @@ function App() {
           </button>
 
           <a
-            href="mailto:db1584@srmist.edu.in?subject=Resume%20Request%20-%20Dharshini%20B%20J"
+            href="mailto:dharshinibj66@gmail.com?subject=Resume%20Request%20-%20Dharshini%20B%20J"
             className="resume-btn"
             title="Request / Download Resume"
           >
             <FileText size={13} />
             <span>Resume</span>
           </a>
-
-          <button
-            className="cli-btn"
-            onClick={() => setCliOpen(true)}
-            aria-label="Open Terminal CLI"
-            title="Open Interactive CLI"
-          >
-            <Terminal size={13} />
-            <span>CLI</span>
-          </button>
 
           <button className="menu-toggle" onClick={() => setMenuOpen(true)} aria-label="Open navigation menu">
             <Menu size={22} />
@@ -241,9 +229,6 @@ function App() {
             <button className="theme-switch" onClick={toggleTheme}>
               <span className="switch-dot" /> {theme === 'side-a' ? 'SIDE A (LIGHT)' : 'SIDE B (DARK)'}
             </button>
-            <button className="cli-btn" onClick={() => { setMenuOpen(false); setCliOpen(true); }}>
-              <Terminal size={13} /> CLI Drawer
-            </button>
           </div>
         </div>
       )}
@@ -264,7 +249,7 @@ function App() {
                 Explore my work <ArrowUpRight size={16} />
               </button>
               <a
-                href="mailto:db1584@srmist.edu.in?subject=Resume%20Request%20-%20Dharshini%20B%20J"
+                href="mailto:dharshinibj66@gmail.com?subject=Resume%20Request%20-%20Dharshini%20B%20J"
                 className="text-link"
               >
                 <Download size={14} /> Get Resume
@@ -462,8 +447,8 @@ function App() {
               <p className="eyebrow">LET’S CONNECT</p>
               <h2>Let’s create<br /><em>something great.</em></h2>
               <div className="contact-links">
-                <a href="mailto:db1584@srmist.edu.in">
-                  <Mail size={16} /> db1584@srmist.edu.in <ArrowUpRight size={14} />
+                <a href="mailto:dharshinibj66@gmail.com">
+                  <Mail size={16} /> dharshinibj66@gmail.com <ArrowUpRight size={14} />
                 </a>
                 <a href="tel:+917305981706">
                   <Send size={16} /> +91 73059 81706 <ArrowUpRight size={14} />
@@ -539,9 +524,6 @@ function App() {
           </div>
         </div>
       )}
-
-      {/* CLI MODAL / EASTER EGG */}
-      {cliOpen && <TerminalModal onClose={() => setCliOpen(false)} onNavigate={scrollTo} />}
     </div>
   );
 }
@@ -675,7 +657,7 @@ function ContactMemoForm() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
-    const mailtoUri = `mailto:db1584@srmist.edu.in?subject=Portfolio%20Inquiry%20from%20${encodeURIComponent(name)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+    const mailtoUri = `mailto:dharshinibj66@gmail.com?subject=Portfolio%20Inquiry%20from%20${encodeURIComponent(name)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
     window.location.href = mailtoUri;
     setStatus('sent');
   };
@@ -742,121 +724,6 @@ function ContactMemoForm() {
           </button>
         </form>
       )}
-    </div>
-  );
-}
-
-function TerminalModal({ onClose, onNavigate }: { onClose: () => void; onNavigate: (id: string) => void }) {
-  const [input, setInput] = useState('');
-  const [history, setHistory] = useState<Array<{ text: string; type?: 'in' | 'out' | 'success' }>>([
-    { text: 'Dharshini B J — Portfolio Terminal v1.0.0 (Type "help" for commands)', type: 'success' },
-  ]);
-
-  const handleCommand = (e: FormEvent) => {
-    e.preventDefault();
-    const cmd = input.trim().toLowerCase();
-    if (!cmd) return;
-
-    const newHistory = [...history, { text: `$ ${input}`, type: 'in' as const }];
-
-    switch (cmd) {
-      case 'help':
-        newHistory.push(
-          { text: 'Available commands:', type: 'out' },
-          { text: '  about      - Display background and university info', type: 'out' },
-          { text: '  skills     - List technical skills & tools', type: 'out' },
-          { text: '  projects   - Show highlighted projects', type: 'out' },
-          { text: '  research   - View published research paper details', type: 'out' },
-          { text: '  contact    - View contact info and email', type: 'out' },
-          { text: '  clear      - Clear terminal output', type: 'out' },
-          { text: '  exit       - Close terminal', type: 'out' }
-        );
-        break;
-      case 'about':
-        newHistory.push(
-          { text: 'Dharshini B J — B.Tech Computer Science (Cloud Computing)', type: 'out' },
-          { text: 'SRM Institute of Science and Technology | CGPA: 9.58 / 10.0', type: 'out' }
-        );
-        onNavigate('about');
-        break;
-      case 'skills':
-        newHistory.push(
-          { text: 'Languages: Python, Java, TypeScript, JavaScript, SQL', type: 'out' },
-          { text: 'Frameworks & Cloud: React.js, Express.js, AWS (EC2, S3), Prisma, Docker', type: 'out' }
-        );
-        onNavigate('skills');
-        break;
-      case 'projects':
-        newHistory.push(
-          { text: '1. PackWise - Travel planning & packing assistant (React, TS, Node, Postgres)', type: 'out' },
-          { text: '2. Real-Time Traffic Prediction - ML framework with XatBoost / XGBoost', type: 'out' },
-          { text: '3. FreshMart - Grocery store management system (MySQL, JS)', type: 'out' }
-        );
-        onNavigate('projects');
-        break;
-      case 'research':
-        newHistory.push(
-          { text: 'Real-Time Traffic Prediction and Route Optimization Framework Using XatBoost Algorithm (ICAF 2025)', type: 'success' }
-        );
-        onNavigate('research');
-        break;
-      case 'contact':
-        newHistory.push(
-          { text: 'Email: db1584@srmist.edu.in | Phone: +91 73059 81706', type: 'out' },
-          { text: 'GitHub: github.com/dharshini66 | LinkedIn: linkedin.com/in/dharshini-bj-778415338', type: 'out' }
-        );
-        onNavigate('contact');
-        break;
-      case 'clear':
-        setHistory([]);
-        setInput('');
-        return;
-      case 'exit':
-        onClose();
-        return;
-      default:
-        newHistory.push({ text: `command not found: ${cmd}. Type "help" for available commands.`, type: 'out' });
-    }
-
-    setHistory(newHistory);
-    setInput('');
-  };
-
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="terminal-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="terminal-header">
-          <div className="terminal-dots">
-            <span />
-            <span />
-            <span />
-          </div>
-          <span>dharshini@portfolio: ~ (bash)</span>
-          <button onClick={onClose} style={{ color: '#8b949e' }}>
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="terminal-body">
-          {history.map((line, idx) => (
-            <div key={idx} className={`terminal-line ${line.type || ''}`}>
-              {line.text}
-            </div>
-          ))}
-        </div>
-
-        <form className="terminal-form" onSubmit={handleCommand}>
-          <span className="terminal-prompt">dharshini@portfolio:~$</span>
-          <input
-            className="terminal-input"
-            type="text"
-            autoFocus
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="type help..."
-          />
-        </form>
-      </div>
     </div>
   );
 }
