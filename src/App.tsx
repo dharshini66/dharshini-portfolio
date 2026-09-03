@@ -7,7 +7,6 @@ import {
   Code2,
   Database,
   Download,
-  ExternalLink,
   FileText,
   Github,
   Linkedin,
@@ -31,7 +30,6 @@ type Project = {
   kind: 'pack' | 'traffic' | 'fresh';
   details: string;
   githubUrl?: string;
-  demoUrl?: string;
 };
 
 const projects: Project[] = [
@@ -44,7 +42,6 @@ const projects: Project[] = [
     kind: 'pack',
     details: 'Designed and developed a full-stack travel planner with secure authentication, REST APIs, Prisma ORM, and a polished responsive experience deployed with Vercel and Railway.',
     githubUrl: 'https://github.com/dharshini66/packwise',
-    demoUrl: 'https://packwise.vercel.app',
   },
   {
     number: '02',
@@ -453,26 +450,15 @@ function App() {
             </div>
 
             <div className="modal-actions">
-              {activeProject.demoUrl && (
-                <a
-                  href={activeProject.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="card-action-btn primary"
-                  style={{ background: 'var(--red)', color: '#fff', padding: '8px 14px', fontSize: '11px' }}
-                >
-                  <ExternalLink size={14} /> Live Demo
-                </a>
-              )}
               {activeProject.githubUrl && (
                 <a
                   href={activeProject.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="card-action-btn"
-                  style={{ padding: '8px 14px', fontSize: '11px' }}
+                  className="card-action-btn primary"
+                  style={{ background: 'var(--red)', color: '#fff', padding: '8px 14px', fontSize: '11px' }}
                 >
-                  <Github size={14} /> Source Code
+                  <Github size={14} /> View on GitHub
                 </a>
               )}
               <button
@@ -597,18 +583,6 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Github size={12} /> Code
-                </a>
-              )}
-              {project.demoUrl && (
-                <a
-                  href={project.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="card-action-btn"
-                  title="View Live Demo"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <ExternalLink size={12} /> Live
                 </a>
               )}
             </div>
