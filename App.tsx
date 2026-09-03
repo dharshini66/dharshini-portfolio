@@ -339,7 +339,7 @@ function App() {
               <div className="reel-tag">REEL 03</div>
               <div>
                 <p className="entry-date">JAN 2025 — FEB 2025 <span>REMOTE</span></p>
-                <h3>Machine Learning Intern <small> / Finalis Machine Learning Program</small></h3>
+                <h3>Machine Learning Intern <small> / Finlatics</small></h3>
                 <p>Developed Python-based supervised learning workflows, focusing on data preprocessing, model evaluation, and predictive analytics.</p>
               </div>
             </div>
